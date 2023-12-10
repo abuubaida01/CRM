@@ -6,4 +6,5 @@ urlpatterns = [
     path('', include("core.urls"), name='index' ),
     path('user/', include("userprofile.urls"), name='index' ),
     path('dashboard/', include("dashboard.urls"), name='dashboard' ),
+    path('dashboard/lead/', include("lead.urls"), name='lead' ),
 ]

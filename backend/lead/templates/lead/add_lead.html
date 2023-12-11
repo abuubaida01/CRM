@@ -7,11 +7,18 @@
 {% block content %}
 <div class='py-6 px-6'>
   <h1 class='text-xl'>Add Lead</h1>
+  {{ team.plan.max_leads }} - {{team.leads.all|length }}
+  {% if team.plan.max_leads > team.leads.all|length %}
+  Number of Leads: {{team.leads.all|length}}
 
-  <form action="." method='post'>
-    {% csrf_token %}
-    {{form.as_p}}
-    <button class='py-4 px-8 bg-red-500 text-white rounded-xl'>SUBMIT</button>
-  </form>
+    <form action="." method='post'>
+      {% csrf_token %}
+      {{form.as_p}}
+      <button class='py-4 px-8 bg-red-500 text-white rounded-xl'>SUBMIT</button>
+    </form>
+  {% else %}
+  <p>You have reached your limit</p>
+  {% endif %}
+  
 </div>
 {% endblock content %}

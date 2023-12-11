@@ -8,4 +8,5 @@ urlpatterns = [
     path('<int:pk>/', lead_detail, name='lead_detail'),
     path('delete/<int:pk>/', leads_delete, name='leads_delete'),
     path('edit/<int:pk>/', leads_edit, name='leads_edit'),
+    path('convert/<int:pk>/', convert_to_client, name='convert_to_client'),
 ]

@@ -22,6 +22,46 @@
     <p class='font-semibold'>modified at</p>
     <p class='mb-6'>{{ client.modified_at }}</p>
 
+
+    <hr>
+    <div class="space-y-4">
+      {% for comment in client.comments.all %}
+        <div class='bg-gray-100 py-6 px-6 rounded-xl'>
+          <p class="mb-2"><strong>{{ comment.created_by }}</strong>  @{{comment.created_at}}</p>
+          {{ comment.content }}
+        </div>
+      {% endfor %}
+
+      {% for file in client.files.all %}
+        <div class='bg-gray-100 py-6 px-6 rounded-xl'>
+          <p class="mb-2"><strong>{{ file.created_by }}</strong>  @{{file.created_at}}</p>
+          <a href="{{file.file.url}}">Download</a>
+        </div>
+      {% endfor %}
+    </div>
+    
+    
+    <hr class='my-4'>
+    <h2 class='text-xl'>Comments</h2>
+    <form action="{% url 'add_client_comment' client.pk %}" method='post'>
+      {% csrf_token %}
+      {{form.as_p}}
+
+      <button class='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Submit</button>
+
+    </form>
+
+    <hr class='my-4'>
+    <h2 class='text-xl'>Files</h2>   
+    <form action="{% url 'clients_add_file' client.pk %}" method='post' enctype='multipart/form-data'>
+      {% csrf_token %}
+      {{fileform.as_p}}
+
+      <button class='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>Submit</button>
+
+    </form> 
+    
+
     <hr>
     <div class='mt-5 flex justify-between'>
       

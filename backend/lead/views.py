@@ -8,6 +8,7 @@ from .forms import AddCommentForm, LeadFileForm
 from django.views.generic import ListView
 from django.urls import reverse, reverse_lazy
 from django.views.generic import View
+from userprofile.models import Userprofile
 
 @login_required
 def leads_list(request):
@@ -41,9 +42,10 @@ class AddCommentView(View):
 
     form = AddCommentForm(request.POST)
     if form.is_valid():
-      team = Team.objects.filter(created_by=request.user)[0]
+      at = Userprofile.objects.get(user=request.user).active_team
+      
       comment = form.save(commit=False)
-      comment.team = team 
+      comment.team = at
       comment.created_by = self.request.user 
       comment.lead_id = pk 
       comment.save()
@@ -56,9 +58,9 @@ class AddFileView(View):
     pk = kwargs.get('pk')
     form = LeadFileForm(request.POST, request.FILES)
     if form.is_valid():
-      team = Team.objects.filter(created_by=request.user)[0]
+      at = Userprofile.objects.get(user=request.user).active_team
       file  = form.save(commit=False)
-      file.team = team 
+      file.team = at
       file.created_by = self.request.user 
       file.lead_id = pk 
       file.save()
@@ -76,16 +78,15 @@ from team.models import Team
 
 @login_required
 def add_lead(request):
-  team = Team.objects.filter(created_by=request.user)[0]
+  at = Userprofile.objects.get(user=request.user).active_team
+
   
   if request.method == 'POST':
     form = AddLeadForm(request.POST)
     if form.is_valid():
-      team = Team.objects.filter(created_by=request.user)[0]
-
       lead = form.save(commit=False)
       lead.created_by = request.user 
-      lead.team = team
+      lead.team = at
       lead.save()
 
       messages.success(request, 'Lead created')
@@ -128,10 +129,11 @@ from client.models import Client, Comment as Client_Comment
 @login_required
 def convert_to_client(request, pk):
   lead = get_object_or_404(Lead, created_by=request.user, pk=pk)
-  team = Team.objects.filter(created_by=request.user)[0]
+  at = Userprofile.objects.get(user=request.user).active_team
 
 
-  client = Client.objects.create(name=lead.name, email=lead.email, description=lead.description, created_by=request.user, team=team)
+
+  client = Client.objects.create(name=lead.name, email=lead.email, description=lead.description, created_by=request.user, team=at)
 
   lead.converted_to_client = True 
   messages.success(request, 'Lead was converted to client')

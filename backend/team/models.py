@@ -14,7 +14,7 @@ class Plan(models.Model):
 
 
 class Team(models.Model):
-  plan = models.ForeignKey(Plan, related_name='teamsplan', on_delete=models.CASCADE)
+  plan = models.ForeignKey(Plan, related_name='teamsplan', blank=True, null=True, on_delete=models.CASCADE)
   name = models.CharField(max_length=100,)
   created_by = models.ForeignKey(User, related_name='created_team', on_delete=models.CASCADE)
   created_at = models.DateTimeField(auto_now_add=True)

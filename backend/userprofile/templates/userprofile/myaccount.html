@@ -14,7 +14,8 @@
     </p>
     
     <p class='mb-2'>
-      <strong>Team: </strong>{{team.name}}
+      <strong>Team: </strong>
+      <a href="{% url 'team_detail' team.pk %}">{{team.name}}</a>
 
       {% if team.created_by == request.user %}
         <a href="{% url 'edit_team' team.pk %}">(Edit Team)</a>

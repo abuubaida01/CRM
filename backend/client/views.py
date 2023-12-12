@@ -5,6 +5,8 @@ from .forms import AddClientForm, CommentForm, ClientFileForm
 from django.contrib import messages
 import csv
 from django.http import HttpResponse
+from userprofile.models import Userprofile
+
 
 @login_required
 def client_export(request):
@@ -31,31 +33,30 @@ def client_list(request):
   clients = Client.objects.filter(created_by=request.user)
   return render(request, 'client/client_list.html', {"clients": clients})
 
+
 @login_required
 def clients_add_file(request, pk):
   client = get_object_or_404(Client, created_by=request.user, pk=pk)
-  team = Team.objects.filter(created_by=request.user)[0]
+  at = Userprofile.objects.get(user=request.user).active_team
 
   if request.method=='POST':
     form = ClientFileForm(request.POST, request.FILES)
     if form.is_valid():
       file  = form.save(commit=False)
-      file.team = team 
+      file.team = at
       file.created_by = request.user 
       file.client_id = pk 
       file.save()
       messages.success(request, 'added file')
     return redirect('client_detail', pk=pk)
-
   else:
     return redirect("client_detail", pk=pk)
-
 
 
 @login_required
 def client_detail(request, pk):
   client = get_object_or_404(Client, created_by=request.user, pk=pk)
-  team = Team.objects.filter(created_by=request.user)[0]
+  at = Userprofile.objects.get(user=request.user).active_team
   fileform = ClientFileForm(request.POST)
 
   if request.method=='POST':
@@ -63,7 +64,7 @@ def client_detail(request, pk):
 
     if form.is_valid():
       comment = form.save(commit=False)
-      comment.team = team 
+      comment.team = at
       comment.created_by = request.user 
       comment.client = client
       comment.save()
@@ -84,16 +85,17 @@ from team.models import Team
 
 @login_required
 def add_client(request):
-  team = Team.objects.filter(created_by=request.user)[0]
+
+  at = Userprofile.objects.get(user=request.user).active_team
+
 
 
   if request.method == 'POST':
     form = AddClientForm(request.POST)
     if form.is_valid():
-      team = Team.objects.filter(created_by=request.user)[0]
       client = form.save(commit=False)
       client.created_by = request.user 
-      client.team = team
+      client.team = at
       client.save()
       messages.success(request, 'Client created')
       return redirect('client_list')

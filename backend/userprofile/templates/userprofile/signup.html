@@ -6,13 +6,17 @@
 
 {% block content %}
 
-  <h1 class='text-xl'>Signup</h1>
+<div class='py-6 px-6'>
+
+  <h1 class='mb-6 text-xl'>Signup</h1>
 
   <form action="." method='post'>
     {% csrf_token %}
     {{form.as_p}}
 
-    <button class='py-4 px-8  bg-teal-500 text-white rounded-xl center'>Submit</button>
+    <button class='mt-6 py-4 px-8  bg-teal-500 text-white rounded-xl center'>Submit</button>
   </form>
+
+</div>
 
 {% endblock content %}

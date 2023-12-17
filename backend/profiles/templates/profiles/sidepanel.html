@@ -1,0 +1,105 @@
+{% load static %}
+{% load myfilters %}
+{% url 'profiles:all-profiles' as people %}
+{% url 'profiles:all-orgs' as org %}
+{% url 'profiles:all-b' as brand %}
+{% url 'profiles:all-cha' as channel %}
+{% url 'profiles:all-mm' as mm %}
+{% url 'profiles:near_me' my_profile.user.username as near_me %}
+{% url 'profiles:following' my_profile.user.username as following %}
+{% url 'profiles:followers' my_profile.user.username as followers %}
+
+
+<div class="ui segment" id='sidepanel'>
+
+  <div class="ui secondary vertical pointing menu">
+    <a href="{{people}}" class="{% if request.path == people %}active{% endif %} item">
+      <i class="fa-solid fa-users"></i>&nbsp;&nbsp;&nbsp; Users
+    </a>
+    <a href="{{org}}" class="{% if request.path == org %}active{% endif %} item">
+      <i class="fa-solid fa-building-ngo"></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Organizations
+    </a>
+    <a href="{{mm}}" class="{% if request.path == mm %}active{% endif %} item">
+      <i class="fa-solid fa-mosque"></i>&nbsp;&nbsp; Masajid & Madaris
+    </a>
+    <a href="{{channel}}" class="{% if request.path == channel %}active{% endif %} item">
+      <i class="fa-solid fa-circle-play"></i>&nbsp;&nbsp;&nbsp; Channels
+    </a>
+    <a href="{{brand}}" class="{% if request.path == brand %}active{% endif %} item">
+      <i class="fa-brands fa-bandcamp"></i>&nbsp;&nbsp;&nbsp; Brands
+    </a>
+    
+    {% if request.user.is_authenticated %}
+      <a href="{{near_me}}" class="{% if request.path == near_me %}active{% endif %} item">
+        <i class="fa-solid fa-people-arrows"></i>&nbsp;&nbsp; Near Me
+      </a>
+    {% else %}
+      <a href="{% url 'account_login' %}" class="item">
+        <i class="fa-solid fa-people-arrows"></i>&nbsp;&nbsp; Near Me
+      </a>
+    {% endif %}
+    
+    {% if request.user.is_authenticated %}
+      <a href="{{following}}" class="{% if request.path == following %}active{% endif %} item">
+        <i class="fa-solid fa-user-group"></i>&nbsp;&nbsp; Following
+      </a>
+    {% else %}
+      <a href="{% url 'account_login' %}" class="item">
+        <i class="fa-solid fa-user-group"></i>&nbsp;&nbsp; Following
+      </a>
+    {% endif %}
+
+    {% if request.user.is_authenticated %}
+    <a href="{{followers}}" class="{% if request.path == followers %}active{% endif %} item">
+      <i class="fa-solid fa-user-group"></i>&nbsp;&nbsp; Followers
+    </a>
+    {% else %}
+    <a href="{% url 'account_login' %}" class="item">
+      <i class="fa-solid fa-user-group"></i>&nbsp;&nbsp; Followers
+    </a>
+    {% endif %}
+      
+
+  </div>
+</div>
+
+{% comment %} 
+<div class="sidebar">
+  <div class="ui segment scroll" id='tab'>
+    <a href="{% url 'profiles:all-profiles' %}"  class="item" >
+      <button class="ui basic black fluid small button" style='margin-bottom:10px;'>
+        <i class="fa-solid fa-users" style='font-size:1em; weight:bold; margin-right:1em;'></i>
+          <b>Saviors</b>
+      </button>
+    </a> 
+
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'profiles:near_me' my_profile.user.username %}"  class="item">
+        <button class="ui basic black fluid small button" style='margin-bottom:10px;'>
+            <i class="fa-solid fa-people-arrows" style='font-size:1em; weight:bold; margin-right:1em;'></i>
+            <b>Near Me</b>
+        </button>
+      </a>
+    {% endif %}
+
+
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'profiles:following' my_profile.user.username %}"  class="item">
+        <button class="ui basic black fluid small button" style='margin-bottom:10px;'>
+            <i class="fa-solid fa-user-group" style='font-size:1em; weight:bold; margin-right:1em;'></i>
+            <b>Following</b>
+        </button>
+      </a>
+    {% endif %}
+
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'profiles:followers' my_profile.user.username %}" class="{% if request.path == show_saved %}active{% endif %} item">
+        <button class="ui basic black fluid small button">
+          <i class="fa-solid fa-user-group"  style='font-size:1em; weight:bold; margin-right:1em;'></i>
+          <b>Followers</b>
+        </button>
+      </a>
+    {% endif %}
+
+    </div>
+  </div> {% endcomment %}

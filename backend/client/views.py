@@ -1,133 +1,110 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Client, ClientFile
+from .models import Client, ClientFile, Comment
 from .forms import AddClientForm, CommentForm, ClientFileForm
 from django.contrib import messages
 import csv
-from django.http import HttpResponse
-from userprofile.models import Userprofile
-
-
-@login_required
-def client_export(request):
-  clients = Client.objects.filter(created_by=request.user)
-
-  # Create the HttpResponse object with the appropriate CSV header.
-  response = HttpResponse(
-      content_type="text/csv",
-      headers={"Content-Disposition": 'attachment; filename="clients.csv"'},
-  )
-
-  writer = csv.writer(response)
-  writer.writerow(["Client", "Description", "Created_at", "Created_by"])
-
-  for client in clients:
-    writer.writerow([client.name, client.description, client.created_at, client.created_by])
-    
-  return response
-
-
-
-@login_required
-def client_list(request):
-  clients = Client.objects.filter(created_by=request.user)
-  return render(request, 'client/client_list.html', {"clients": clients})
-
-
-@login_required
-def clients_add_file(request, pk):
-  client = get_object_or_404(Client, created_by=request.user, pk=pk)
-  at = Userprofile.objects.get(user=request.user).active_team
-
-  if request.method=='POST':
-    form = ClientFileForm(request.POST, request.FILES)
-    if form.is_valid():
-      file  = form.save(commit=False)
-      file.team = at
-      file.created_by = request.user 
-      file.client_id = pk 
-      file.save()
-      messages.success(request, 'added file')
-    return redirect('client_detail', pk=pk)
-  else:
-    return redirect("client_detail", pk=pk)
-
-
-@login_required
-def client_detail(request, pk):
-  client = get_object_or_404(Client, created_by=request.user, pk=pk)
-  at = Userprofile.objects.get(user=request.user).active_team
-  fileform = ClientFileForm(request.POST)
-
-  if request.method=='POST':
-    form = CommentForm(request.POST)
-
-    if form.is_valid():
-      comment = form.save(commit=False)
-      comment.team = at
-      comment.created_by = request.user 
-      comment.client = client
-      comment.save()
-
-      return redirect('client_detail', pk=pk)    
-  else:
-    form = CommentForm()
-
-  return render(request, 'client/client_detail.html', {
-    'client': client,
-    'form': form,
-    'fileform': fileform,
-  })
-
-
+from .serializers import ClientSerializer, ClientFileSerializer, CommentSerializer
 from team.models import Team
 
+#====================================================
+from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveAPIView, ListCreateAPIView, RetrieveUpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.status import HTTP_200_OK
 
-@login_required
-def add_client(request):
-
-  at = Userprofile.objects.get(user=request.user).active_team
 
 
+class ClientListAPIView(ListAPIView):
+  serializer_class = ClientSerializer
+  # permission_classes = [IsAuthenticated]
+  def get_queryset(self):
+      return Client.objects.filter(created_by=self.request.user)
 
-  if request.method == 'POST':
-    form = AddClientForm(request.POST)
-    if form.is_valid():
-      client = form.save(commit=False)
-      client.created_by = request.user 
-      client.team = at
-      client.save()
-      messages.success(request, 'Client created')
-      return redirect('client_list')
-  else:
-    form = AddClientForm()
 
-  return render(request, 'client/add_client.html', {'form': form, 'team': team})
+class CDetailExportAPI(APIView):
+  def get(self, request, *args, **kwargs):
+    clients = Client.objects.filter(created_by=self.request.user)
+
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="clients.csv"'},
+    )
+
+    writer = csv.writer(response)
+    writer.writerow(["Client", "Description", "Created_at", "Created_by"])
+
+    for client in clients:
+      writer.writerow([client.name, client.description, client.created_at, client.created_by])
+      
+    return response
+
+
+class AttachFileWithClient(CreateAPIView):
+  serializer_class = ClientFileSerializer
+  model = ClientFile
+
+  def post(self, request, pk, *args, **kwargs):
+    client = get_object_or_404(Client, created_by=self.request.user, pk=pk)
+    active_team = Profile.objects.get(user=request.user).active_team
+    serializer =  self.get_serializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(HTTP_200_OK)
+
+
+class ClientDetailAPIView(RetrieveAPIView):
+  model = Client
+  serializer_class = ClientSerializer
+  lookup_field = 'pk'
+  queryset = Client.objects.all()
+
+
+class CommentAPIView(ListCreateAPIView):
+  serializer_class = CommentSerializer
+  queryset = Comment.objects.all()
+
+  def post(self, request, *args, **kwargs):
+    client = get_object_or_404(Client, created_by=request.user, pk=self.kwargs['pk'])
+    at = Profile.objects.get(user=request.user).active_team
+    serializer = self.get_serializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save(team=at, client=client, created_by=self.request.user)
+    return Response(HTTP_200_OK)
+
+
+
+class AddClientAPIView(CreateAPIView):
+  serializer_class = ClientSerializer
+
+  def post(self, request,*args, **kwargs):
+    at = Profile.objects.get(user=request.user).active_team
+    serializer = ClientSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save(created_by=self.request.user, team=at)
+    return Response(HTTP_200_OK)
+
+
+
+class UpdateClientAPIView(RetrieveUpdateAPIView):
+  serializer_class = ClientSerializer
+  queryset = Client.objects.all()
+  lookup_field = 'pk'
+
+  def patch(self, request, pk ,*args, **kwargs):
+    client = Client.objects.get(pk=pk, created_by=self.request.user)
+    serializer = self.get_serializer(client, data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(HTTP_200_OK) 
   
 
 
-@login_required
-def client_edit(request, pk): 
-  client = get_object_or_404(Client, created_by=request.user, pk=pk)
-  if request.method == 'POST':
-    form = AddClientForm(request.POST, instance=client)
-    if form.is_valid():
-      form.save()
-      messages.success(request, 'Client was Edited')
-      return redirect('client_list')
-
-  else:
-    form = AddClientForm(instance=client)
-  return render(request, 'client/edit_client.html', {'form': form})
-
-
-
-@login_required
-def client_delete(request, pk):
-  print("in the delete view", pk)
-  client = get_object_or_404(Client, created_by=request.user, pk=pk)
-  client.delete()
-  messages.success(request, 'client was deleted')
-  return redirect("client_list")
+class DestroyClientAPIView(RetrieveDestroyAPIView):
+  serializer_class = ClientSerializer
+  lookup_field = 'pk'
+  queryset = Client.objects.all()
 
 

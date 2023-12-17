@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update {{user.username|truncatechars:20}}{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href={% static 'css/form.css' %}>
+<link rel="stylesheet" type="text/css" href={% static 'profiles/style.css' %}>
+<link rel="stylesheet" type="text/css" href={% static 'pvc/style.css' %}>
+
+
+{% endblock css %}
+
+{% block header %}
+    {% include "main/navbar.html" %}     
+{% endblock header %}
+
+{% block content %}
+<div class="ui container-fluid">
+  <div class="ui grid">
+    <div class="row">
+        
+      <div class="three wide column" >
+        {% include 'profiles/settings.html' %}
+      </div>
+    
+      <div class="thirteen wide column">
+        <div class="ui grid">
+          <div class="row">
+
+            <div class="sixteen wide column">
+              <div id='update_upload' class='ui black segment' style='margin-left:1em;'>
+                <h3>Update User Info</h3>
+                <hr>
+                <form action="" method='POST' class='ui form' enctype='multipart/form-data' id='form'>
+                  {% csrf_token %}
+                  {{ form }}
+                  <button class='ui large secondary button fluid mt-3' type='submit'>Update</button>
+                  <p style='color: blue;' id='sefarz_english_font'>It will take time to update your User Info, keep patience</p>
+                </form>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+{% endblock content %}
+
+{% comment %} {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+User Credentials
+{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href={% static 'css/form.css' %}>
+<link rel="stylesheet" type="text/css" href={% static 'pvc/style.css' %}>
+{% endblock css %}
+
+{% block header %}
+    {% include "main/navbar.html" %}     
+{% endblock header %}
+
+{% block content %}
+<div class="ui container-fluid">
+  <div class="ui grid">
+    <div class="row">
+        
+      <div class="three wide column" >
+        {% include 'profiles/settings.html' %}
+      </div>
+    
+      <div class="thirteen wide column">
+        <div class="ui grid">
+          <div class="row" style='margin-top:3em; margin-left:2em;'>
+
+            <div class="sixteen wide column">
+              <div id='update_upload' class='ui raised black segment' >
+                <h3>Update User</h3>
+                <hr>
+                <form action="" method='POST' class='ui form' enctype='multipart/form-data' id='form'>
+                  {% csrf_token %}
+                  {{ form }}
+                  <button class='ui button primary mt-3' type='submit'>Update</button>
+                </form>
+                <a href="{% url 'account_change_password' %}" class="ui secondary button">
+                  <i class="key icon"></i>Change Password
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %} {% endcomment %}

@@ -1,0 +1,29 @@
+{% load static %}
+{% load mathfilters %}
+
+<div class="ui small modal" id='ReportUser'>
+  {% if my_profile != profile %}
+  <div class="header">Report {{profile.user.full_name|truncatechars:20}}</div>
+    <div class="content">
+      <div class="content">
+        <p>If you believe that a user on our platform has violated our rules or engaged in inappropriate behavior, Please provide a detailed description of the issue. Our team will review your report and take appropriate action if the report is found to be valid</p><hr><br>
+      </div>
+        <form action="{% url 'support:ReportUserFunc' %}" method=post>
+          {% csrf_token %}
+          <input type="hidden" name="profile_pk" value={{profile.pk}}> 
+          <input type="text" placeholder='What did he do?' class="form-control" id='ReportUser' name='problem' id={{profile.pk}} width='400px'>
+          <button type='submit' class='ui basic blue button fluid'>Submit</button>
+          <a  onclick='ReportUser{{profile.pk}}()' class='ui red basic fluid button mt-2'><b>close</b></a>
+      </form>
+    </div>
+    {% else %}
+    <div class="header">You can't report yourself</div>
+    {% endif %}
+</div>
+
+
+<script>
+  function ReportUser{{profile.pk}}(){
+    $('#ReportUser').modal('hide');
+  }
+</script>

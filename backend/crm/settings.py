@@ -29,12 +29,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'client',
     'team',
     'core',
-    'userprofile',
     'dashboard',
     'lead',
+    'profiles',
+    'stats',
+    'support',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +82,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+AUTH_USER_MODEL = 'user.User'
 
 
 # Password validation

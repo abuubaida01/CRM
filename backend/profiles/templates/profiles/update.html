@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update {{user.username|truncatechars:20}}{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href={% static 'css/form.css' %}>
+<link rel="stylesheet" type="text/css" href={% static 'profiles/style.css' %}>
+
+
+{% endblock css %}
+
+{% block header %}
+    {% include "main/navbar.html" %}     
+{% endblock header %}
+
+{% block content %}
+<div class="ui container-fluid">
+  <div class="ui grid">
+    <div class="row">
+        
+      <div class="three wide column" >
+        {% include 'profiles/settings.html' %}
+      </div>
+    
+      <div class="thirteen wide column">
+        <div class="ui grid">
+          <div class="row">
+
+            <div class="sixteen wide column">
+              <div id='update_upload' class='ui black segment' style='margin-left:1em;'>
+                <h3>Update Profiles</h3>
+                <hr>
+                <p style='color: red;' id='sefarz_english_font'>Leave the field blank, if you don't want to show. </p>
+                <form action="" method='POST' class='ui form' enctype='multipart/form-data' id='form'>
+                  {% csrf_token %}
+                  {{ form }}
+                  <button class='ui large secondary button fluid mt-3' type='submit'>Update</button>
+                  <button class='ui large basic red button fluid mt-3' onclick='goBack()' type='button'>Back</button>
+                  <p style='color: blue;' id='sefarz_english_font'>It will take time to update your profile, keep patience</p>
+                </form>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+  function goBack() {
+    // Use the history object to go back to the previous page
+    window.history.back();
+  }
+</script>
+{% endblock content %}

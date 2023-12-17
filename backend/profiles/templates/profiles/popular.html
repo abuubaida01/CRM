@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load myfilters %}
+
+
+
+{% block title %}Near Me{% endblock title %}
+
+{% block css %}
+  <link rel="stylesheet" type="text/css" href={% static 'pvc/style.css' %}>
+  {% comment %} overriding some method of pvc/style.css {% endcomment %}
+  <link rel="stylesheet" type="text/css" href={% static 'profiles/style.css' %}>
+{% endblock css %}
+
+{% block header %}
+    {% include "main/navbar.html" %}     
+{% endblock header %}
+
+
+{% block content %}
+
+<div class="ui container-fuild">
+  <div class="ui grid">
+    <div class="row">
+        
+      <div class="three wide column" >
+        {% include 'profiles/sidepanel.html' %}
+      </div>
+
+      <div class="thirteen wide column">
+
+        <div class="ui grid">
+          <div class="row" style="margin-top: 2em; margin-left:7em;">
+              <div class="ui four cards">
+                
+              {% for pro in popular_pro %}
+              <a href="{% url 'profiles:profile-detail-view' pro.user.username %}">
+                <div id='card1' class="card">
+                  <div class="ui small image">
+                    {% if pro.user.is_authenticated %} <!--todo-->
+                    <img src="{{pro.picture.url}}" class='status'>
+                    {% else %}
+                    <img src="{{pro.picture.url}}">
+                    {% endif %}
+                  </div>
+                  <div class="content">
+                    <div class="header">{{pro.user.full_name|truncatechars:20}}</div>
+                    <div class="meta">
+                      <a href="{% url 'profiles:profile-detail-view' pro.user.username %}">{{pro.cur_add|truncatechars:25}}</a>
+                    </div>
+                    <i class="user icon"></i>
+                      {{pro.get_followers|length}} Followers
+                  </div>
+                  {% with profile=pro %}
+                    <center>{% include 'main/follow_unfollow.html' %}</center>
+                  {% endwith %}
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!--show advertisement-->
+      <div class="three wide column">
+      </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'pvc/main.js' %}"></script>
+<script type="text/javascript" src="{% static 'pvc/player.js' %}" defer></script>
+
+{% endblock script %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+You Follow these peoples
+{% endblock title %}
+
+
+{% block css %}
+  <link rel="stylesheet" type="text/css" href={% static 'pvc/style.css' %}>
+  <link rel="stylesheet" type="text/css" href={% static 'profiles/style.css' %}>
+
+{% endblock css %}
+
+{% block header %}
+    {% include "main/navbar.html" %}     
+{% endblock header %}
+
+{% block content %}
+
+  <div class="ui container-fluid"> 
+    <div class="ui grid">
+      <div class="row">
+        <div class="three wide column" >
+          {% include 'profiles/sidepanel.html' %}
+        </div>
+        <!-- if no people -->
+      {% if is_empty %}
+        No Following to interact with
+      {% endif %}
+      
+  
+    <div class="thirteen wide column">
+      
+      <div id='profile_bannar'>
+        {% comment %} <center class='top_ad_container'>
+          <script type="text/javascript">
+            atOptions = {
+            'key' : 'a7c13fc1ce7928500af33f274437ed67',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+            };
+            document.write('<scr' + 'ipt type="text/javascript" src="http' + (location.protocol === 'https:' ? 's' : '') + '://sluicebigheartedpeevish.com/a7c13fc1ce7928500af33f274437ed67/invoke.js"></scr' + 'ipt>');
+        </script>
+        </center> {% endcomment %}
+      </div>
+
+      <center><h1 id='recommendation_heading' style='margin-top: 0.5em;'>Following</h1><hr></center>
+      <div class="ui grid">
+        <div class="ui row" id='profile_list_margins'>
+          {% if following_profiles %}
+          <div class="ui four cards">
+            {% for obj in  following_profiles %}
+
+            
+              <a href="{% url 'profiles:profile-detail-view' obj.user.username %}">
+                <div id='card1'class="card">
+                  <div class="ui small image ">
+                    <img src="{{obj.picture.url}}">
+                  </div>
+                  <div class="content">
+                    <span class="header">
+                      {{obj.user.full_name|truncatechars:20}}
+                      {% if obj.is_org_verified %}<a data-tooltip="Verified {{obj.type_of_verified_org}}" data-position="bottom center"> <i class="check circle icon" style="color: green;"></i></a>{% endif %}
+                    </span>
+                    <div class="meta">
+                      <a href="{% url 'profiles:profile-detail-view' obj.user.username %}">
+                      {% if obj.cat == 'Organization' %}
+                      <span data-tooltip="Organization" data-position="bottom left">
+                      <i class="fa-solid fa-at" style="color: blue; margin:0px;"></i></span>
+                      {% elif obj.cat == 'Brand' %}
+                      <span data-tooltip="Brand" data-position="bottom left">
+                      <i class="fa-solid fa-at" style="color: orange; margin:0px;"></i></span>
+                      {% elif obj.cat == 'Channel' %}
+                      <span data-tooltip="Channel" data-position="bottom left">
+                      <i class="fa-solid fa-at" style="color: red; margin:0px;"></i></span>
+                      {% elif obj.cat == 'Masjid & Madrasa' %}
+                      <span data-tooltip="Masjid & Madrasa" data-position="bottom left">
+                      <i class="fa-solid fa-at" style="color: green; margin:0px;"></i></span>
+                      {% else %}
+                      <span data-tooltip="General" data-position="bottom left">
+                      <i class="fa-solid fa-at" style="color: black; margin:0px;"></i></span>
+                      {% endif %}{{obj.user.username|truncatechars:20}}</a>
+                    </div>
+                    <i class="user icon"></i>
+                      {{obj.get_followers|length}} Followers
+                  </div>
+
+                  {% with profile=obj %}
+                    {% include 'main/follow_unfollow.html' %}
+                  {% endwith %}
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+          {% else %}
+          <center><div class="ui green message" style='width:90%; margin-bottom:1em; margin-right:12em;'><b>You don't follow anyone</b></div></center>
+          {% endif %}
+
+        
+        </div>
+
+        
+      </div>
+  </div>
+  </div>
+  </div>
+  </div>
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,294 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% load myfilters %}
+
+{% block title %}{{profile.user.username}}{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href={% static 'profiles/style.css' %}>
+<link rel="stylesheet" type="text/css" href={% static 'fam/style.css' %}>
+{% endblock css %}
+
+
+{% block header %}
+    {% include "main/navbar.html" %}     
+{% endblock header %}
+
+{% block content %}
+
+<div style="margin-top: 4em;"  class="ui container-xl ">
+  <div class="ui grid">
+    <div class="ui row">
+      <div class="ui raised segment" id='profile_card' >
+        <div class="ui grid">
+        <!--Proflie introduction!-->
+          {% if profile.slogan %}
+          <div class="row">
+            <i><h1 style="text-align: center" id='slogan'>{{profile.slogan}}</h1></i>
+          </div><br>
+          {% endif %}
+          
+          <div class="row">
+            <div class="ui grid">
+              <div class="nine wide column">
+                <div class="ui items">
+                  <div class="item">
+                    <div class="css-after">
+                      {% if profile.user.is_authenticated %} <!--todo-->
+                      <img src="{{profile.picture.url}}">
+                      {% comment %} <i class="circular green check icon"></i> {% endcomment %}
+                      {% else %}
+                      <img src="{{profile.picture.url}}">
+                      {% endif %}
+                    </div>
+                    <div class="content" id='details'>
+                      <h2>{{profile.user.full_name|truncatechars:25}}
+                        {% if profile.is_org_verified %}
+                        <a data-tooltip="Verified {{profile.type_of_verified_org}}" data-position="bottom center"> 
+                            <i class="check circle icon" style="color: green;"></i>
+                        </a>
+                        {% endif %}
+                      </h2>
+                      <h3>
+                        
+                          {% if profile.cat == 'Organization' %}
+                          <span data-tooltip="Organization" data-position="bottom left">
+                          <i class="fa-solid fa-at" style="color: blue; margin:0px;"></i></span>
+                          {% elif profile.cat == 'Brand' %}
+                          <span data-tooltip="Brand" data-position="bottom left">
+                          <i class="fa-solid fa-at" style="color: orange; margin:0px;"></i></span>
+                          {% elif profile.cat == 'Channel' %}
+                          <span data-tooltip="Channel" data-position="bottom left">
+                          <i class="fa-solid fa-at" style="color: red; margin:0px;"></i></span>
+                          {% elif profile.cat == 'Masjid & Madrasa' %}
+                          <span data-tooltip="Masjid & Madrasa" data-position="bottom left">
+                          <i class="fa-solid fa-at" style="color: green; margin:0px;"></i></span>
+                          {% else %}
+                          <span data-tooltip="General" data-position="bottom left">
+                          <i class="fa-solid fa-at" style="color: black; margin:0px;"></i></span>
+                          {% endif %}
+                          {{profile.user.username|truncatechars:25}}
+                          
+                        {% if request.user == profile.user %}
+                          <a href="{% url 'user:user-update' my_profile.user.username %}" class="profile-link">
+                            <i class="fa-solid fa-user-pen"></i>
+                          </a>
+                        {% endif %}
+                      </h3>
+                      
+                      
+                      {% if request.user != profile.user %}
+                        {% with profile=profile %}
+                          {% include 'main/follow_unfollow.html' %}
+                        {% endwith %}
+                      {% else %}
+                          <a href="{% url  'profiles:profile_update' my_profile.pk %}">
+                            <button class="ui large secondary button">Edit Profile</button>
+                          </a>                
+                      {% endif %}
+                      
+                      <br><br>
+                      <div class="description">
+                        <div class="ui blue labels">
+                          
+                          {% if user == profile.user %}
+                            {% if myfollowers > 1 %}
+                              <a href=" {% url 'profiles:followers' profile.user.username %} ">
+                                <div class="ui label">{{myfollowers}}&#160;&#160;
+                                  Followers
+                                </div>
+                              </a>
+                            {% else %}
+                              <a href=" {% url 'profiles:followers' profile.user.username %} ">
+                                <div class="ui label">{{profile.get_follower_no|format_number}}&#160;&#160;
+                                  Follower
+                                </div>
+                              </a>
+                            {% endif %}
+    
+                            
+                          {% else %}
+                            <a href=" {% url 'profiles:followers' profile.user.username %} ">
+                              <div class="ui label">{{profile.get_follower_no|format_number}}&#160;&#160;
+                                Followers
+                              </div>
+                            </a>
+                          {% endif %}
+                          
+                          
+                          {% if user == profile.user %}
+                          <a href="{% url 'profiles:following' profile.user.username %}">
+                            <div class="ui label" data-tooltip="only you can see, who you follow" data-position="bottom left"><b>{{profile.get_following_no|format_number}}</b>&nbsp; Following
+                            </div>
+                          </a>
+                          {% endif %}
+                          
+                          <br>
+                        </div>
+                      </div>
+                    </div>
+                  </div>    
+                </div>
+              </div>
+              <div class="seven wide column">
+                <div class='information' id='prof_info'>
+                  {% if profile.intro %}
+                  <h3>About</h3><p style="width: 33rem; white-space: pre-wrap;" >{{profile.intro}}</p>
+                  {% endif %}
+                  {% if profile.profession %}
+                  <span ><strong>Profession</strong></span>:&nbsp;&nbsp;&nbsp;{{profile.profession}} <br>
+                  {% endif %}
+                  {% if profile.cur_add %}
+                  <span><strong>Address</strong></span>: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{profile.cur_add}} <br>
+                  {% endif %}
+                  {% comment %} {% if profile.phone_number%}
+                  <span><strong>Phone #</strong></span>: &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;{{profile.phone_number}}<br>
+                  {% endif %} {% endcomment %}
+                  {% comment %} <span><strong>Religion</strong></span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{user.religion}} <br> {% endcomment %}
+                  {% if request.user == profile.user %}
+                    {% if profile.total_pvcIncome %}
+                      <div class="ui " data-tooltip="Only you can see this" data-position="bottom left">Your total income from PVC is <strong>{{profile.total_pvcIncome|format_rupees}} Rs</strong>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                </div>
+                {% include 'profiles/report_profile.html' %}
+                <div class="ui dropdown" style='float:right;  position: absolute; bottom: 0; right:0; margin-bottom:1em; '>
+                  {% if  my_profile != profile  %}
+                    <i class="align large justify icon"></i>
+                    <div class="menu">
+                      <div class="item">
+                        {% if request.user.is_authenticated %}
+                        <a onclick='ReportUser()'>
+                          <i class="flag icon"></i>
+                          Report User
+                        </a>
+                        {% else %}
+                        <a href="{% url 'account_login' %}">
+                          <i class="flag icon"></i>
+                          Report User
+                        </a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              
+          </div>
+        </div>
+        </div>    
+      </div>
+    </div>
+
+    <div class="row"  id='profile_menu'>
+    <center>
+      <div class="ui very relaxed horizontal list">
+        <div class="item">
+            <a href="{% url 'profiles:fam' profile.user.username %}" class='ui blue button'>
+                <b>{{profile.get_fam_no|format_number}}</b> &nbsp;FAM
+            </a>
+        </div>
+        
+
+        <div class="item">
+            <br>
+            <a href="{% url 'profiles:pvc' profile.user.username %}" class='ui blue button'>
+                <b>{{profile.get_post_no|format_number}} &nbsp; PVC</b>
+            </a>
+        </div>
+
+        <div class="item">
+            <br>
+            <a href="{% url 'profiles:org' profile.user.username %}" class='ui blue button'>
+                <b>{{profile.get_org_count|format_number}}</b> &nbsp;ORG
+            </a>
+        </div>
+
+        <div class="item">
+          <br>
+          <a href="{% url 'profiles:ads' profile.user.username %}" class='ui blue button'>
+              <b>{{profile.get_ads_count|format_number}} &nbsp; Savads</b>
+          </a>
+      </div>
+      
+      </div>
+    </center>
+      
+
+    </div> 
+
+    <div class="ui row" id='profile_content'>
+      {% block posts %}
+        {% if run_pvc %}
+          {% if profile.get_all_authors_posts %}
+          <div style='margin-left:4.5em;'>
+            {% include "profiles/profile_pvc.html" %}
+          </div>
+          {% else %}
+            <div style='margin-left:2em;'>
+              <center><div class="ui green message" style='width:90%; margin-bottom:1em;'>  <b>Profile has no PVC to show</b></div></center>
+            </div>
+          {% endif %}
+        
+        {% elif run_fam %} <!--else FAM-->
+        {% if profile.get_fam %}
+          <div style='margin-left:2em;'>
+            {% include "profiles/profile_fam.html" %}
+          </div>
+          {% else %}
+            <div style='margin-left:2em;'>
+              <center><div class="ui green message" style='width:90%; margin-bottom:1em;'>  <b>Profile has no FAM Posts to show</b></div></center>
+            </div>
+          {% endif %}
+        
+        {% elif run_org %}
+          {% if profile.get_all_org_posts %}
+            <div style='margin-left:2em;'>
+              {% include "profiles/profile_org.html" %}
+            </div>
+          {% else %}
+              <div style='margin-left:2em;'>
+                <center><div class="ui green message" style='width:90%; margin-bottom:1em;'>  <b>Profile has no ORG Posts to show</b></div></center>
+              </div>
+            {% endif %}
+
+        {% elif run_ads %}
+          {% if profile.get_all_ads_posts %}
+          <div style='margin-left:2em;'>
+            {% include "profiles/profile_ads.html" %}
+          </div>
+          {% else %}
+            <div style='margin-left:2em;'>
+              <center><div class="ui green message" style='width:90%; margin-bottom:1em;'>  <b>Profile has no Ads to show</b></div></center>
+            </div>
+          {% endif %}
+
+        {% else %}
+          <hr>
+          <div style='margin-left:2em;'>
+            <center><div class="ui green message" style='width:90%; margin-bottom:1em;'>  <b>Profile has no Posts to show</b></div></center>
+          </div> 
+        {% endif %}
+      {% endblock posts %} 
+    </div>
+
+  </div>
+
+  
+</div>
+
+{% endblock content %}
+
+{% block script %}
+  <script src= "{% static 'profiles/main.js' %}" defer></script>
+  <script type="text/javascript" src="{% static 'fam/main.js' %}"></script>
+
+  <script>
+    function ReportUser(){
+      $('#ReportUser').modal('show');
+    }
+  </script>
+{% endblock script %}
+
+

@@ -1,0 +1,18 @@
+{% comment %} {% extends 'profiles/profile.html' %} {% endcomment %}
+{% load static %}
+{% load mathfilters %}
+{% load myfilters %}
+
+<div  class="ui container-xl"> 
+    <div class="row">
+        <div class="ui grid">
+        {% for obj in org_videos %}
+            {% comment %} {% if obj.verified >= 50 or obj.satisfied %} {% endcomment %}
+                <div class="row">
+                    {% include 'org/videos.html' %}
+                </div>
+            {% comment %} {% endif %} {% endcomment %}
+        {% endfor %}
+        </div>
+    </div>
+</div>

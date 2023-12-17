@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+ 
+{% block title %}People{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href={% static 'pvc/style.css' %}>
+<link rel="stylesheet" type="text/css" href={% static 'profiles/style.css' %}>
+
+{% endblock css %}
+
+{% block header %}
+    {% include "main/navbar.html" %}     
+{% endblock header %}
+
+
+{% block content %}
+
+<div class="ui container-fluid">
+  <div class="ui grid">
+    <div class="row">
+        
+      <div class="three wide column" >
+        {% include 'profiles/sidepanel.html' %}
+      </div>
+    
+      <div class="thirteen wide column">
+        <div>
+          <br>
+        </div>
+
+        <div class="ui grid">
+          <div class="ui row" >
+            <div class="ui ten wide column centered aligned" id='search-items'> 
+              <form action="{% url 'profiles:search-user' %}" method="GET"> 
+                  {% csrf_token %}
+                    <div id='search_bar' class="ui right action left icon input">
+                        <i class="search icon"></i>
+                        <input type="hidden" name='category' value='General'>
+                        <input  type="text" name='query' id='search_here' value='{{ request.GET.query }}' placeholder="Search Profile...">
+                        <a href="{% url 'profiles:all-profiles' %}">
+                          <i id='cross' class="fa-solid fa-xmark ui large"></i>
+                        </a>
+                        <button type='submit' class="ui button">Search</button>
+                    </div>
+                </form>
+            </div>
+          </div>
+
+          <div class="ui row">
+            <div>
+              {% if search_list %}
+                <center><div class="ui green message" style='width:90%; margin-bottom:1em;' id='search_message'>  
+                  <b><h3>Found {{search_list|length}} Users with the name "{{request.GET.query}}"</h3></b>
+                </div></center>
+                
+                <div class="ui four cards" id='profile_list_margins' >
+                  {% for obj in  search_list %}
+
+                    <a href="{% url 'profiles:profile-detail-view' obj.user.username %}">
+                      <div id='card1' class="card">
+                        <div class="ui small image ">
+                          <img src="{{obj.picture.url}}">
+                        </div>
+                        <div class="content"> 
+                          <span class="header">
+                            {{obj.user.full_name|truncatechars:20}}
+                            {% if obj.is_org_verified %}<a data-tooltip="Verified {{obj.type_of_verified_org}}" data-position="bottom center"> <i class="check circle icon" style="color: green;"></i></a>{% endif %}
+                          </span>
+                          
+                          <div class="meta">
+                            <a href="{% url 'profiles:profile-detail-view' obj.user.username %}">
+                            {% if obj.cat == 'Organization' %}
+                            <span data-tooltip="Organization" data-position="bottom left">
+                            <i class="fa-solid fa-at" style="color: blue; margin:0px;"></i></span>
+                            {% elif obj.cat == 'Brand' %}
+                            <span data-tooltip="Brand" data-position="bottom left">
+                            <i class="fa-solid fa-at" style="color: orange; margin:0px;"></i></span>
+                            {% elif obj.cat == 'Channel' %}
+                            <span data-tooltip="Channel" data-position="bottom left">
+                            <i class="fa-solid fa-at" style="color: red; margin:0px;"></i></span>
+                            {% elif obj.cat == 'Masjid & Madrasa' %}
+                            <span data-tooltip="Masjid & Madrasa" data-position="bottom left">
+                            <i class="fa-solid fa-at" style="color: green; margin:0px;"></i></span>
+                            {% else %}
+                            <span data-tooltip="General" data-position="bottom left">
+                            <i class="fa-solid fa-at" style="color: black; margin:0px;"></i></span>
+                            {% endif %}{{obj.user.username|truncatechars:20}}</a>
+                            {% if obj.promote %}
+                            <span class="ui red mini label">Promoted</span>
+                            {% endif %}
+                          </div>
+                          <i class="user icon"></i>
+                            {{obj.get_followers|length}} Followers
+                        </div>
+
+                        {% with profile=obj %}
+                          {% include 'main/follow_unfollow.html' %}
+                        {% endwith %}
+                      </div>
+                    </a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+
+              
+              {% if  recommendations_4u %}
+              <center><h1 id='recommendation_heading'><b>Recommendations</b></h1><hr></center>
+
+              <div  id='profile_list_margins' >            
+                <!-- People to show -->
+                <div class="ui four cards">
+                  {% for obj in  recommendations_4u %}
+
+
+                    <a href="{% url 'profiles:profile-detail-view' obj.user.username %}">
+
+                      <div id='card1' class="card">
+                        
+                        <div class="ui small image">
+                          {% if obj.user.is_authenticated %} <!--todo-->
+                          <img src="{{obj.picture.url}}" class='status'>
+                          {% else %}
+                          <img src="{{obj.picture.url}}">
+                          {% endif %}
+                        </div>
+                        <div class="content">
+                          <span class="header">
+                            {{obj.user.full_name|truncatechars:20}}
+                            {% if obj.is_org_verified %}<a data-tooltip="Verified {{obj.type_of_verified_org}}" data-position="bottom center"> <i class="check circle icon" style="color: green;"></i></a>{% endif %}
+                          </span>
+
+                          <div class="meta">
+                            
+                            <a href="{% url 'profiles:profile-detail-view' obj.user.username %}">
+                              <span data-tooltip="General" data-position="bottom left"><i class="fa-solid fa-at" style="color: black; margin:0px;"></i><span>{{obj.user.username|truncatechars:20}}</a>
+                              {% if obj.promote %}
+                              <span class="ui red mini label">Promoted</span>
+                              {% endif %}
+                          </div>
+                          <i class="user icon"></i>
+                            {{obj.get_followers|length}} Followers
+                        </div>
+                        {% with profile=obj %}
+                          <center>{% include 'main/follow_unfollow.html' %}</center>
+                        {% endwith %}
+                      </div>
+                    </a>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+
+              {% if  not recommendations_4u and not search_list%}
+              <center><div class="ui green message" style='width:90%'><b>No Profile was found with the name "{{ request.GET.query }}"</b></div></center>
+              {% endif %}
+
+            </div>
+
+          </div>
+
+
+          
+        </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  
+
+</div>
+
+
+
+{% endblock content %}
+
+
+
+
+
+
+

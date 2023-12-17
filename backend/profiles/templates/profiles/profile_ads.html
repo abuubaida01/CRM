@@ -1,0 +1,17 @@
+{% load static %}
+{% load mathfilters %}
+{% load myfilters %}
+
+<div  class="ui container-xl"> 
+    <div class="row">
+        <div class="ui grid">
+        
+          {% for ad in  all_ads %}
+          <div id='fam_ad'>
+            {% include 'savads/advertisement.html' %}
+          </div>
+          {% endfor %}
+        
+        </div>
+    </div>
+</div>

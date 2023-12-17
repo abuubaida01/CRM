@@ -1,0 +1,34 @@
+{% load static %}
+{% url 'user:user-update' my_profile.user.username as update_user %}
+{% url 'profiles:profile_update' my_profile.pk as update_profile%}
+{% url 'account_change_password' as update_password %}
+{% url 'org:Verify_org' my_profile.pk as verify_org%}
+{% comment %} {% url 'pvc:verify_PVC' my_profile.pk as verify_PVC%} {% endcomment %}
+
+
+
+
+<div class="ui segment" id='sidepanel'>
+
+  <div class="ui secondary vertical pointing menu">
+    <a href="{{update_user}}" class="{% if request.path == update_user %}active{% endif %} item">
+      <i class="fa-solid fa-pen"></i>&nbsp;&nbsp; User Info
+    </a>
+    <a href="{{ update_profile }}" class="{% if request.path == update_profile %}active{% endif %} item">
+      <i class="fa-solid fa-pen"></i>&nbsp;&nbsp; Profile Detials
+    </a>
+    <a href="{{ update_password}}" class="{% if request.path == update_password %}active{% endif %} item">
+      Change Password
+    </a>
+
+    <a href="{{verify_org}}" class="{% if request.path == verify_org %}active{% endif %} item">
+      {% comment %} <i class="fa-solid fa-circle-check" style="color: #00ff7b;"></i> {% endcomment %}
+      Verification Badge 
+    </a>
+
+    {% comment %} <a href="{{verify_PVC}}" class="{% if request.path == verify_PVC %}active{% endif %} item">
+      Verify PVC Profile  <i class="check circle icon" style="color: red;"></i>
+    </a> {% endcomment %}
+
+  </div> 
+</div>

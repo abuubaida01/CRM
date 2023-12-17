@@ -1,9 +1,9 @@
 from .models import Team 
-from userprofile.models import Userprofile
+from profiles.models import Profile
 
 def active_team(request):
   if request.user.is_authenticated:
-    uu  = Userprofile.objects.get(user=request.user)
+    uu  = Profile.objects.get(user=request.user)
     if uu.active_team:
       active_team = uu.active_team
     else:
